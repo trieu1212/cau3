@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
+
 <body>
     <label for="">Mã hóa đơn</label>
-    <select name="MAHD" id="MAHD"></select>
+    <select name="MAHD" id="MAHD">
+        <?php
+        include('connect.php');
+        $sql = "select * from hoadon";
+        $result = $con->query($sql);
+        while ($row = $result->fetch_assoc()) {
+            echo "<option value='" . $row['MAHD'] . "'>" . $row['MAHD'] . "</option>";
+        }
+        ?>
+    </select>
     <div>
         <h2>Danh sách các phòng còn trống</h2>
         <div>
@@ -40,80 +51,71 @@
         </div>
     </div>
     <script>
-        $(document).ready(function(){
-            loadhd();
+        $(document).ready(function() {
             loadphongtrong();
-            $('#MAHD').on('change',function(){
+            $('#MAHD').on('change', function() {
                 var MAHD = $('#MAHD').val();
                 loadphongdathem(MAHD);
             })
         })
-        $(document).on('click','.add',function(){
+        $(document).on('click', '.add', function() {
             var MAPHONG = $(this).data('maphong');
             var MAHD = $('#MAHD').val();
-            add(MAHD,MAPHONG);
+            add(MAHD, MAPHONG);
         })
-        $(document).on('click','.del',function(){
+        $(document).on('click', '.del', function() {
             var MAPHONG = $(this).data('maphong');
             var MAHD = $('#MAHD').val();
-            del(MAHD,MAPHONG);
+            del(MAHD, MAPHONG);
         })
-        // load mã hóa đơn
-        function loadhd(){
+        // load thông tin phòng trống
+        function loadphongtrong() {
             $.ajax({
                 type: 'GET',
-                url: 'loadmahd.php',
-                success: function(data){
-                    $('#MAHD').html(data);
-                }
-            })
-        }
-        // load thông tin phòng trống
-        function loadphongtrong(){
-                $.ajax({
-                type: 'GET',
                 url: 'loadphongtrong.php',
-                success: function(data){
+                success: function(data) {
                     $('#dsempty').html(data);
                 }
             })
         }
         //load thông tin phồng đã thêm của hóa đơn
-        function loadphongdathem(MAHD){
+        function loadphongdathem(MAHD) {
             $.ajax({
                 type: 'GET',
                 url: 'loadphongdathem.php',
-                data:{MAHD:MAHD},
-                success: function(data){
+                data: {
+                    MAHD: MAHD
+                },
+                success: function(data) {
                     $('#dsadd').html(data);
                 }
             })
-        } 
+        }
         // thêm phòng 
-        function add(MAHD,MAPHONG){
+        function add(MAHD, MAPHONG) {
             $.ajax({
                 type: 'post',
                 url: 'add.php',
-                data:{
-                    MAHD:MAHD,
-                    MAPHONG:MAPHONG
+                data: {
+                    MAHD: MAHD,
+                    MAPHONG: MAPHONG
                 },
-                success: function(data){
+                success: function(data) {
                     loadphongtrong();
                     loadphongdathem(MAHD);
                 }
             })
         }
         // //xóa phòng khỏi danh sách
-        function del(MAHD,MAPHONG){
+        function del(MAHD, MAPHONG) {
             $.ajax({
-                type:'post',
-                url:'del.php',
-                data:{
-                    MAHD:MAHD,
-                    MAPHONG:MAPHONG
+                type: 'post',
+                url: 'del.php',
+                data: {
+                    MAHD: MAHD,
+                    MAPHONG: MAPHONG
                 },
-                success:function(data){
+                success: function(data) {
                     loadphongtrong();
                     loadphongdathem(MAHD);
                 }
@@ -121,4 +123,5 @@
         }
     </script>
 </body>
+
 </html>
